@@ -1,0 +1,32 @@
+input:focus { 
+    outline: none !important;
+}
+
+@media screen and  (max-width: 900px){
+    #cmdInput{
+        width: 70%;
+    }
+    #cmdButton {
+        width: 30%;
+    }
+}
+
+@media screen and  (min-width: 900px){
+    #cmdInput{
+        width: 90%;
+    }
+    #cmdButton {
+        width: 10%;
+    }
+}
+
+#cmdInput{
+    
+    background-color: black;
+    height: fit-content;
+}
+
+#cmdButton {
+
+    background-color: black;
+}

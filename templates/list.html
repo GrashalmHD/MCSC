@@ -1,0 +1,90 @@
+{% include 'snippets/header.jinja2'%}
+
+
+<script>
+    function addUser(){
+        var elem = document.getElementById('pName')
+        var req = new XMLHttpRequest();
+
+        var name = elem.value;
+
+        if(name == ""){
+            return;
+        }
+
+        var url = "/list/{{name}}/add/"+name;
+        req.open("POST",url,false);
+
+        req.send();
+
+        try{
+            var data = req.responseText;
+            var data_json = JSON.parse(data);
+        }catch{
+            return;
+        }
+        
+        if(data_json.status == 0){
+            alert("Could not find user");
+        }else{
+            location.reload(true);
+        }
+
+        
+
+    }
+
+    function press(e){
+        if(e.keyCode==13){
+            addUser();
+        }
+    }
+
+</script>
+
+<h1>{{name}}</h1>
+
+    <br/>
+    <br/>
+
+    <hr/>
+    <h3>Add User</h3>
+    <div class="row g-3 align-items-center" style="width: 75%;">
+        <div class="col-3" style="width: 70%;">
+            <input type="text" id="pName" style="width: 100%;"/>
+            <script>document.getElementById('pName').onkeypress = press;</script>
+        </div>
+        <div class="col">
+            <button onclick="addUser();" class="btn btn-primary" style="float: left;">
+                <i class="fas fa-user-plus"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <hr/>
+
+    {%for elem in list%}
+        <form method="POST" action="/list/{{name}}/delete/{{elem.uuid}}">
+            <div class="row border border-dark rounded align-items-center" style="border: black;">
+                <div class="col">
+                    <img src="https://crafatar.com/avatars/{{elem.uuid}}?size=60"/>
+                </div>
+                <div class="col-3" style="width: 75%;">
+                    <h3>{{elem.name}}</h3>
+                    <h5>{{elem.uuid}}</h5>
+                </div>
+                <div class="col">
+                    <button class="btn btn-danger" style="margin: 5px;">
+                        <i class="fas fa-user-minus fa-3x"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <br/>
+    {%endfor%}
+
+    <p>Player head images provided by <a href="https://crafatar.com">Crafatar</a></p>
+
+
+{% include 'snippets/footer.jinja2'%}

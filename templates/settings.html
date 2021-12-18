@@ -1,0 +1,117 @@
+{% include 'snippets/header.jinja2'%}
+
+
+<script>
+
+    function revert(){
+        if(confirm("Do you really wish to revert your changes?")){
+            location.reload(true);
+        }
+    }
+
+    function save(){
+        var req = new XMLHttpRequest();
+        req.open("POST","/settings/save",false);
+        req.send();
+
+        var resp = req.responseText;
+        var resp_json = JSON.parse(resp)
+
+        console.log(resp_json);
+
+        if(resp_json.status == "0"){
+          alert("Saving failed. Please try again or contact site owner.");
+        }else{
+          alert("Saving successful.");
+          location.reload(true);
+        }
+
+    }
+
+    var visible = false;
+
+    function toggleSettings(){
+      var elems = document.getElementsByName('settingContainerDisabled');
+      
+      elems.forEach(toggleSetting)
+      if(visible){
+        visible = false;
+      }else{
+        visible = true;
+      }
+    }
+
+    function toggleSetting(item,index){
+      if(visible){
+          item.style.display = 'none';
+          
+        }else{
+          item.style.display = '';
+          
+        }
+    }
+
+</script>
+
+
+<center>
+    <div id = "body" style="width: 75%;">
+
+        <br/>
+        <br/>
+        <h1>Settings</h1>
+        <br/>
+
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-primary" onclick="toggleSettings()" style="float: right;">Show hidden Settings</button>
+          </div>
+        </div>
+
+        <br/>
+
+        <form action="/settings/save" method="POST">
+        {%for name, value in settings.items()%}
+
+
+        
+        <div class="row g-3 align-items-center" {%if not value.infos.show%} style="display: none;" name="settingContainerDisabled"{%endif%}>
+            <div class="col-auto" style="width: 50%;">
+              <label class="col-form-label">{{name}}</label>
+            </div>
+            <div class="col-auto" style="width: 50%;">
+              {%if value.infos.isStr %}
+                  <input name="{{name}}" type="text" class="form-control" value="{{value.val}}">
+              {%endif%}
+              {%if value.infos.isBool%}
+                  <input name="{{name}}" type="checkbox" {%if 'true' == value.val %}checked{%endif%}>
+              {%endif%}
+              {%if value.infos.isInt%}
+                  <input name="{{name}}" type="text" class="form-control" value="{{value.val}}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+              {%endif%}
+            </div>
+            <hr/>
+          </div>
+
+        
+        {%endfor%}
+
+        <br/>
+
+          <div class="row">
+            <div class="col">
+                <buton onclick="revert();" type="button" class="btn btn-danger" style="width: 70%;">Revert</buton>
+            </div>
+            <div class="col">
+                <input type="submit" class="btn btn-primary" onclick="return confirm('Do you really want to save these changes?');" value="Save" style="width: 70%;"/>
+            </div>
+
+          </div>
+
+          <br/>
+        
+          </form>
+    </div>
+</center>
+
+{% include 'snippets/footer.jinja2'%}

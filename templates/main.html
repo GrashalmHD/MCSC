@@ -1,0 +1,48 @@
+{%set page = "main"%}
+
+{% include 'snippets/header.jinja2'%}
+
+<link href="/static/main.css" rel="stylesheet">
+
+<center>
+<h1>
+Welcome {{current_user.name}}
+</h1>
+
+<div id="controlPanel">
+
+    <div class="row">
+    {%for entry in components%}
+
+    {%set test = (loop.index0 / cols)%}
+
+
+
+    {%if  (test - (test|int)) == 0 %}
+    </div>
+    
+    <div class="row">
+    {%endif%}
+
+        <div class="col">
+            <a href="{{entry.location}}">
+                <div class="border border-primary" id="border-div" onclick="  ">
+                    <br/>
+                    <h3>{{entry.name}}</h3>
+                    <br/>
+                    <i class="fas {{entry.iconData}} fa-10x" style="color: {{entry.color}};"></i>
+                    <br/>
+                    <br/>
+                    <br/>
+                </div>
+            </a>
+        </div>   
+
+    {%endfor%}
+    </div>
+
+</div>
+
+</center>
+
+{% include 'snippets/footer.jinja2'%}

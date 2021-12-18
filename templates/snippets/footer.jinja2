@@ -1,0 +1,41 @@
+</div>
+
+<script>
+
+function send(){
+        var req = new XMLHttpRequest()
+        req.open("GET","/test")
+        req.send()
+    }
+
+
+    var span = null;
+
+    var dataSource = null;
+
+    var dataUpdated = false;
+
+    function getServerUpdate(){
+        dataSource = new EventSource("/stream");
+        dataSource.onmessage = function (e){
+            span = document.getElementById('updateSpan');
+            span.textContent = e.data;     
+        } 
+    }
+
+    getServerUpdate();
+    window.onbeforeunload = function(event){
+        if(dataSource != null){
+            dataSource.close();
+        }
+    }
+</script>
+
+<div style="width: 100%; height: 30px; background-color: #90ee90; position: fixed; bottom: 0px;">
+    <span id="updateSpan"></span>
+    <script>var xml = new XMLHttpRequest();xml.open("GET","/lastUpdate",false);xml.send();document.getElementById('updateSpan').textContent = xml.responseText;</script>
+</div>
+
+</center>
+</body>
+</html>

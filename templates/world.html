@@ -1,0 +1,177 @@
+{% include 'snippets/header.jinja2'%}
+
+<br>
+<br>
+
+<script>
+
+    function toggleEdit(id){
+        var h = document.getElementById(id+'Name');
+        var input = document.getElementById(id+'Input');
+        var edit = document.getElementById(id+'Edit');
+        var save = document.getElementById(id+'Save')
+        var abort = document.getElementById(id+'Abort')
+
+        if(h.style.display == 'none'){
+            h.style.display = 'inline';
+            edit.style.display = 'inline';
+            input.style.display = 'none';
+            save.style.display = 'none';
+            abort.style.display = 'none';
+        }else{
+            h.style.display = 'none';
+            edit.style.display = 'none';
+            input.style.display = 'inline';
+            save.style.display = 'inline';
+            abort.style.display = 'inline';
+        }
+    }
+
+    function changeName(id){
+        var input = document.getElementById(id+'Input');
+        var req = new XMLHttpRequest();
+        req.open("POST","/world/"+id+"/changeName",false);
+        var data = {};
+        data.name = input.value;
+        
+        req.send(JSON.stringify(data));
+
+        if(req.status == 200){
+            location.reload(true);
+        }else{
+            alert("Edit failed!");
+        }
+    }
+
+    function setActive(id){
+        var req = new XMLHttpRequest();
+        req.open("POST","/world/"+id+"/setActive",false);
+        req.send(null)
+
+        if(req.status != 200){
+            alert("Could not set World as active!");
+        }else{
+            location.reload(true);
+        }
+    }
+
+    function downloadWorld(id){
+        location.href = "/world/" + id + "/download";
+    }
+
+    function deleteWorld(id) {
+        var req = new XMLHttpRequest();
+        req.open("POST","/world/"+id+"/delete",false);
+        req.send();
+
+        if(req.status != 200){
+            alert("Could not delete world!");
+        }else{
+            location.reload(true);
+        }
+    }
+
+    function upload(){
+        var file = document.getElementById('selectedWorld').files[0];
+
+        if(file.type == "application/zip"){
+        
+            let form = new FormData();
+
+            form.set("world",file,"world.zip");
+
+            fetch("/world/upload",{
+                method:'POST',
+                body: form,
+            }).then((response) => {
+                if(response.status != 200){
+                    alert('Could not upload file')
+                }else{
+                    location.reload(true);
+                }
+            })
+
+        }else{
+            alert("Not a zip file");
+        }
+    }
+
+</script>
+
+
+<div class="row">
+    <div class="col"></div>
+    <div class="col">
+        <input type="file" class="btn btn-primary" id="selectedWorld">
+        <button class="btn btn-primary" onclick="upload()">
+            <i class="fas fa-upload"></i>
+            <label>Upload</label>
+        </button>
+    </div>
+</div>
+
+<h1>Active:</h1>
+{%for world in worlds%}
+{%if world.id == active%}
+    <div class="row align-items-center">
+        <div class="col">
+            <img src="world/{{world.id}}/getIcon">
+        </div>
+        <div class="col">
+            <h2>
+                {{world.name}}
+            </h2>
+        </div>
+        <div class="col">
+            <button class="btn btn-secondary" onclick="downloadWorld('{{world.id}}');">
+                <i class="fas fa-download"></i>
+            </button>
+        </div>
+    </div>
+{%endif%}
+{%endfor%}
+<hr/>
+
+<br>
+<h1>Worlds:</h1>
+<hr/>
+{%for world in worlds%}
+{%if not world.id == active%}
+    <div class="row align-items-center">
+        <div class="col">
+            <img src="world/{{world.id}}/getIcon">
+        </div>
+        <div class="col">
+            <input type="text" value="{{world.name}}" id="{{world.id}}Input" style="display: none;">
+            <h4 style="display: inline;" id="{{world.id}}Name">
+                {{world.name}}
+            </h4>
+            <button style="border: none; background-color: transparent;" id = "{{world.id}}Edit" onclick="toggleEdit('{{world.id}}');">
+                <i class="fas fa-pen"></i>
+            </button>
+            <button style="border: none; background-color: transparent; display: none;" id = "{{world.id}}Save" onclick="changeName('{{world.id}}');">
+                <i class="fas fa-check" style="background-color: green;"></i>
+            </button>
+            <button style="border: none; background-color: transparent; display: none;" id = "{{world.id}}Abort" onclick="toggleEdit('{{world.id}}');">
+                <i class="fas fa-times" style="background-color: red;"></i>
+            </button>
+
+        </div>
+        <div class="col">
+            <button class="btn btn-success" onclick="setActive('{{world.id}}');">
+                <i class="fas fa-level-up-alt"></i>
+            </button>
+            <button class="btn btn-danger" onclick="deleteWorld('{{world.id}}');">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button class="btn btn-secondary" onclick="downloadWorld('{{world.id}}');">
+                <i class="fas fa-download"></i>
+            </button>
+
+        </div>
+    </div>
+    <hr/>
+{%endif%}
+{%endfor%}
+
+{% include 'snippets/footer.jinja2'%}

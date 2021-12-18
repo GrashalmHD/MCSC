@@ -1,0 +1,18 @@
+{% include 'snippets/header.jinja2'%}
+
+<script>
+    document.body.onload = function (){
+        var log = document.getElementById("log");
+        log.scrollTo(0,log.scrollHeight);
+    }
+</script>
+
+<center>
+    <div style="margin: 20px; display: block; background-color: black; text-align: left; height: 85vh;">
+        <span id='log' style="overflow: auto; margin: 10px; display: block; white-space: pre-line;color: white; height: 100%;">{{log}}</span>
+    </div>
+    
+    <a class="btn btn-primary" href="{{url_for('console.getlogtxt')}}">Download Txt</a>
+
+    
+</center>

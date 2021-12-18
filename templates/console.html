@@ -1,0 +1,81 @@
+{% include 'snippets/header.jinja2'%}
+
+<link href="static/console.css" rel="stylesheet" />
+
+
+<script>
+
+var firstLoad = true;
+
+setInterval(() => {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", "{{url_for('console.getlog')}}", false ); // false for synchronous request
+    xmlHttp.send( null );
+    var log = document.getElementById('log');
+    var currPos = log.scrollTop;
+    var maxPos = log.scrollHeight - log.clientHeight;
+
+    log.textContent = xmlHttp.responseText;
+    if(currPos == maxPos){
+        log.scrollTo(0,log.scrollHeight);
+    }
+    else if(firstLoad){
+        firstLoad = false;
+        log.scrollTo(0,log.scrollHeight);
+    }
+}, 1000);
+
+function myFunction(e){
+    if(e.which == 13){
+        command = document.getElementById('input').value;
+
+        sendCmd(command);
+    }
+}
+
+function sendCmd(command){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "{{url_for('console.sendcmd')}}", true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({
+        cmd: command 
+    }));
+
+    var element = document.getElementById('input');
+    element.value = ''
+}
+
+</script>
+
+
+<div style="margin: 20px; height: 80vh;">
+    <div class="row" style="height: 95%;">
+
+        <div class="col" style="display: block; background-color: black; text-align: left; height: 100%;">
+            <span id='log' style="display: block; white-space: pre-line;overflow-y: scroll;overflow:auto; color: white; height: 100%;"></span>
+        </div>
+
+    </div>
+    
+    <br/>
+    
+    <div class="row" style="height: auto;">
+        <div id="cmdInput" class="col-6">
+            <input onkeypress="myFunction(event)" id="input" placeholder=">_" style="color:white; background-color: transparent; width: 100%; height: 100%; border: none; outline-width: 0;">
+        </div>
+
+        <div id="cmdButton" class="col rounded-end" style="padding-right: 0px;">
+            <div class="btn-group" style="float: right;background-color: transparent;">
+                <button onclick="sendCmd(document.getElementById('input').value);" class="btn btn-secondary" type="button">
+                    Run
+                  </button>
+                <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="/getlogall">View Log</a></li>
+                </ul>
+              </div>
+        </div>
+    </div>
+</div>
